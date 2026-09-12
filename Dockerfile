@@ -5,6 +5,7 @@ FROM python:3.12-slim AS builder
 COPY --from=ghcr.io/astral-sh/uv:0.8.0 /uv /usr/local/bin/uv
 WORKDIR /app/process-runtime
 COPY platform-auth-sdk /app/platform-auth-sdk
+COPY control-plane/client /app/control-plane/client
 COPY process-runtime/pyproject.toml process-runtime/uv.lock process-runtime/README.md ./
 RUN uv sync --frozen --no-dev --no-install-project
 

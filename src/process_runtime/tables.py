@@ -135,6 +135,44 @@ process_events = sa.Table(
     sa.Column("occurred_at", sa.DateTime(timezone=True), nullable=False),
 )
 
+# Control Plane bridge (superproject ADR-0023 §3-4, ADR-0032): reconciliation metadata
+# only — the authoritative mapping activity -> Task is the Control Plane's own generic
+# external reference (``external_system=process-runtime``); this table keeps what the
+# bridge needs to stay idempotent across restarts (cp task id, state) and the cursors.
+process_task_bindings = sa.Table(
+    "process_task_bindings",
+    metadata,
+    sa.Column("id", sa.Uuid(as_uuid=True), primary_key=True, nullable=False),
+    sa.Column("tenant_id", sa.Uuid(as_uuid=True), nullable=False),
+    sa.Column(
+        "workflow_instance_id",
+        sa.Uuid(as_uuid=True),
+        sa.ForeignKey("workflow_instances.id", ondelete="CASCADE"),
+        nullable=False,
+    ),
+    sa.Column("task_id", sa.Text(), nullable=False),
+    sa.Column("source_event_id", sa.BigInteger(), nullable=False),
+    sa.Column("cp_task_id", sa.Uuid(as_uuid=True), nullable=False),
+    sa.Column("cp_public_id", sa.Text(), nullable=True),
+    sa.Column("status", sa.Text(), nullable=False),
+    sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+    sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
+    sa.CheckConstraint(
+        "status IN ('open','completing','completed','cancelled')",
+        name="ck_process_task_bindings_status",
+    ),
+    sa.UniqueConstraint("source_event_id", name="uq_process_task_bindings_event"),
+    sa.UniqueConstraint("cp_task_id", name="uq_process_task_bindings_cp_task"),
+)
+
+bridge_cursors = sa.Table(
+    "bridge_cursors",
+    metadata,
+    sa.Column("name", sa.Text(), primary_key=True, nullable=False),
+    sa.Column("cursor", sa.Text(), nullable=True),
+    sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
+)
+
 sa.Index("idx_wi_tenant_status", workflow_instances.c.tenant_id, workflow_instances.c.status)
 sa.Index(
     "idx_wi_subject",
@@ -151,10 +189,18 @@ sa.Index(
     "idx_wtask_instance_status", workflow_tasks.c.workflow_instance_id, workflow_tasks.c.status
 )
 sa.Index("idx_process_events_tenant", process_events.c.tenant_id, process_events.c.id)
+sa.Index(
+    "idx_ptb_instance_open",
+    process_task_bindings.c.workflow_instance_id,
+    process_task_bindings.c.task_id,
+    postgresql_where=sa.text("status IN ('open','completing')"),
+)
 
 __all__ = [
+    "bridge_cursors",
     "metadata",
     "process_events",
+    "process_task_bindings",
     "workflow_instances",
     "workflow_tasks",
     "workflow_timers",

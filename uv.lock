@@ -160,6 +160,17 @@ wheels = [
 ]
 
 [[package]]
+name = "control-plane-client"
+version = "0.6.0"
+source = { editable = "../control-plane/client" }
+dependencies = [
+    { name = "httpx" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "httpx", specifier = ">=0.28.1" }]
+
+[[package]]
 name = "cryptography"
 version = "50.0.1"
 source = { registry = "https://pypi.org/simple" }
@@ -995,6 +1006,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "alembic" },
+    { name = "control-plane-client" },
     { name = "fastapi" },
     { name = "opentelemetry-api" },
     { name = "platform-auth-sdk" },
@@ -1018,6 +1030,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "alembic", specifier = ">=1.13" },
+    { name = "control-plane-client", editable = "../control-plane/client" },
     { name = "fastapi", specifier = ">=0.115" },
     { name = "opentelemetry-api", specifier = ">=1.25" },
     { name = "platform-auth-sdk", editable = "../platform-auth-sdk" },

@@ -16,6 +16,7 @@ from process_runtime.auth import (
     IamContextVerifier,
     IamVerificationUnavailable,
 )
+from process_runtime.bridge import build_bridge, run_forever
 from process_runtime.config import Settings
 from process_runtime.db import Database
 from process_runtime.events import ProcessEventLog
@@ -53,6 +54,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         )
         app.state.engine = engine
         app.state.service = service
+        tasks: list[asyncio.Task[None]] = []
+        closers = []
+        if runtime_settings.bridge_enabled():
+            bridge, client = build_bridge(
+                runtime_settings,
+                session_factory=database.sessions,
+                store=store,
+                service=service,
+                registry=engine.registry,
+            )
+            app.state.bridge = bridge
+            closers.append(client.aclose)
+            tasks.append(
+                asyncio.create_task(
+                    run_forever(bridge, poll_seconds=runtime_settings.bridge_poll_seconds)
+                )
+            )
         worker: asyncio.Task[None] | None = None
         if runtime_settings.timer_worker_enabled:
             worker = asyncio.create_task(
@@ -64,13 +82,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     batch_size=runtime_settings.timer_due_batch_size,
                 )
             )
+        if worker is not None:
+            tasks.append(worker)
         try:
             yield
         finally:
-            if worker is not None:
-                worker.cancel()
+            for task in tasks:
+                task.cancel()
                 with contextlib.suppress(asyncio.CancelledError):
-                    await worker
+                    await task
+            for close in closers:
+                await close()
             await database.close()
 
     app = FastAPI(title="Process Runtime", version="0.1.0", lifespan=lifespan)
@@ -101,6 +123,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {
             "status": "ok",
             "definitions": len(list(engine.registry.iter_declarations())) if engine else 0,
+            "controlPlaneBridge": getattr(app.state, "bridge", None) is not None,
         }
 
     app.include_router(router)

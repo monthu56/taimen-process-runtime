@@ -11,6 +11,7 @@
   GET  /instances/{id}/diagram                       BPMN/DMN + active tokens
   GET  /inbox                                        human tasks (assignee=me | role=…)
   GET  /events                                       process event feed with a cursor
+  GET  /manifest                                     capability manifest (ADR-0023 §2)
 
 Every path is scoped to the tenant of the presented IAM token; authority is the token's
 scopes (``process:read`` / ``process:write`` / ``process:admin``). Acting on a human task
@@ -45,6 +46,7 @@ from process_runtime.domain.errors import (
 )
 from process_runtime.domain.value_objects import MigrationMap
 from process_runtime.events import ProcessEventLog
+from process_runtime.manifest import MANIFEST
 from process_runtime.runtime.bootstrap import Engine
 from process_runtime.runtime.pg_store import PostgresWorkflowEngineStore
 from process_runtime.runtime.runtime import WorkflowAdvanceService
@@ -227,6 +229,12 @@ def _may_act_on_task(task: WorkflowTask, caller: Caller) -> bool:
 
 
 # --------------------------------------------------------------------- endpoints
+@router.get("/manifest")
+async def manifest(_: Reader) -> dict[str, Any]:
+    """Capability manifest (ADR-0023 §2): standards, executable subset, extension profile."""
+    return MANIFEST
+
+
 @router.get("/definitions", response_model=list[WorkflowDefinitionRead])
 async def list_definitions(_: Reader, engine: EngineDep) -> list[WorkflowDefinitionRead]:
     return [

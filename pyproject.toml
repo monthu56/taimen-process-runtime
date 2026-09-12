@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 license = { text = "Proprietary" }
 dependencies = [
     "alembic>=1.13",
+    "control-plane-client",
     "fastapi>=0.115",
     "opentelemetry-api>=1.25",
     "platform-auth-sdk",
@@ -42,6 +43,8 @@ package = true
 # Общий enforcement SDK — соседний репозиторий суперпроекта (ADR-0029/0030):
 # контекст docker build поэтому — корень суперпроекта, не каталог сервиса.
 platform-auth-sdk = { path = "../platform-auth-sdk", editable = true }
+# Канонический клиент ядра (ADR-0030): мост в Control Plane ходит только через него.
+control-plane-client = { path = "../control-plane/client", editable = true }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

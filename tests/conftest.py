@@ -35,8 +35,8 @@ IAM_ISSUER = "https://iam.example/iam"
 IAM_AUDIENCE = "process-runtime"
 
 _TRUNCATE = text(
-    "TRUNCATE process_events, workflow_tasks, workflow_timers, workflow_transition_log, "
-    "workflow_instances CASCADE"
+    "TRUNCATE bridge_cursors, process_task_bindings, process_events, workflow_tasks, "
+    "workflow_timers, workflow_transition_log, workflow_instances CASCADE"
 )
 
 
