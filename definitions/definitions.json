@@ -1,0 +1,23 @@
+{
+  "workflows": [
+    {
+      "workflow_id": "three_step_approval",
+      "version": 1,
+      "bpmn_path": "generic/three_step_approval-v1.bpmn",
+      "description": "Sample 3-step approval: initial review (lane reviewers) → final approval (lane approvers)"
+    },
+    {
+      "workflow_id": "score_routing",
+      "version": 1,
+      "bpmn_path": "generic/score_routing-v1.bpmn",
+      "dmn_paths": ["generic/sample_decision-v1.dmn"],
+      "description": "DMN business rule sample: score → category A/B/C"
+    },
+    {
+      "workflow_id": "timer_reminder",
+      "version": 1,
+      "bpmn_path": "generic/timer_reminder-v1.bpmn",
+      "description": "Timer event sample: waits reminder_duration (ISO 8601) then completes"
+    }
+  ]
+}

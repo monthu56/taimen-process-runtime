@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:spiffworkflow="http://spiffworkflow.org/bpmn/schema/1.0/core"
+                  id="Definitions_three_step_approval"
+                  targetNamespace="http://platform.example.com/workflows">
+  <bpmn:process id="three_step_approval" name="Three Step Approval" isExecutable="true">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_reviewers" name="reviewers">
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>initial_review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_initial</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_rejected_initial</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_approvers" name="approvers">
+        <bpmn:flowNodeRef>final_approval</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_final</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_approved</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_rejected_final</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <bpmn:startEvent id="StartEvent_1" name="Start">
+      <bpmn:outgoing>Flow_start_review</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:userTask id="initial_review" name="Initial Review">
+      <bpmn:extensionElements>
+        <spiffworkflow:properties>
+          <spiffworkflow:property name="form_slug" value="initial-review-form" />
+        </spiffworkflow:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_start_review</bpmn:incoming>
+      <bpmn:outgoing>Flow_review_gateway</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_initial" name="Initial Decision">
+      <bpmn:incoming>Flow_review_gateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_initial_approve</bpmn:outgoing>
+      <bpmn:outgoing>Flow_initial_reject</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:userTask id="final_approval" name="Final Approval">
+      <bpmn:extensionElements>
+        <spiffworkflow:properties>
+          <spiffworkflow:property name="form_slug" value="final-approval-form" />
+        </spiffworkflow:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_initial_approve</bpmn:incoming>
+      <bpmn:outgoing>Flow_final_gateway</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_final" name="Final Decision">
+      <bpmn:incoming>Flow_final_gateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_final_approve</bpmn:outgoing>
+      <bpmn:outgoing>Flow_final_reject</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:endEvent id="EndEvent_approved" name="Approved">
+      <bpmn:incoming>Flow_final_approve</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="EndEvent_rejected_initial" name="Rejected (initial)">
+      <bpmn:incoming>Flow_initial_reject</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="EndEvent_rejected_final" name="Rejected (final)">
+      <bpmn:incoming>Flow_final_reject</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_start_review" sourceRef="StartEvent_1" targetRef="initial_review" />
+    <bpmn:sequenceFlow id="Flow_review_gateway" sourceRef="initial_review" targetRef="Gateway_initial" />
+    <bpmn:sequenceFlow id="Flow_initial_approve" name="approve" sourceRef="Gateway_initial" targetRef="final_approval">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">initial_decision == 'approve'</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_initial_reject" name="reject" sourceRef="Gateway_initial" targetRef="EndEvent_rejected_initial">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">initial_decision != 'approve'</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_final_gateway" sourceRef="final_approval" targetRef="Gateway_final" />
+    <bpmn:sequenceFlow id="Flow_final_approve" name="approve" sourceRef="Gateway_final" targetRef="EndEvent_approved">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">final_decision == 'approve'</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_final_reject" name="reject" sourceRef="Gateway_final" targetRef="EndEvent_rejected_final">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">final_decision != 'approve'</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+  </bpmn:process>
+</bpmn:definitions>

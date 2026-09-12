@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             xmlns:spiffworkflow="http://spiffworkflow.org/bpmn/schema/1.0/core"
+             id="Definitions_sample_decision"
+             name="Sample Decision"
+             namespace="http://platform.example.com/dmn">
+  <decision id="sample_decision" name="Score Category">
+    <decisionTable id="DecisionTable_score" hitPolicy="FIRST">
+      <input id="Input_score" label="Score">
+        <inputExpression id="InputExpression_score" typeRef="integer">
+          <text>score</text>
+        </inputExpression>
+      </input>
+      <output id="Output_category" label="Category" name="category" typeRef="string" />
+      <rule id="Rule_low">
+        <inputEntry id="Entry_low_in"><text>&lt;= 30</text></inputEntry>
+        <outputEntry id="Entry_low_out"><text>"A"</text></outputEntry>
+      </rule>
+      <rule id="Rule_mid">
+        <inputEntry id="Entry_mid_in"><text>&lt;= 70</text></inputEntry>
+        <outputEntry id="Entry_mid_out"><text>"B"</text></outputEntry>
+      </rule>
+      <rule id="Rule_high">
+        <inputEntry id="Entry_high_in"><text>&gt; 70</text></inputEntry>
+        <outputEntry id="Entry_high_out"><text>"C"</text></outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

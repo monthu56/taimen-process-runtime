@@ -1,0 +1,19 @@
+# PostgreSQL для тестов на реальной БД (store, runtime, API):
+#   docker compose -f compose.test.yml up -d --wait db-test
+#   PR_TEST_DATABASE_URL=postgresql+psycopg://process:process@localhost:5437/process_test uv run pytest
+services:
+  db-test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: process
+      POSTGRES_PASSWORD: process
+      POSTGRES_DB: process_test
+    ports:
+      - "127.0.0.1:5437:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U process -d process_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 20

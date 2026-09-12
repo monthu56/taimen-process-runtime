@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:spiffworkflow="http://spiffworkflow.org/bpmn/schema/1.0/core"
+                  id="Definitions_score_routing"
+                  targetNamespace="http://platform.example.com/workflows">
+  <bpmn:process id="score_routing" name="Score Routing" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_start_rule</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:businessRuleTask id="categorize" name="Categorize">
+      <bpmn:extensionElements>
+        <spiffworkflow:calledDecisionId>sample_decision</spiffworkflow:calledDecisionId>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_start_rule</bpmn:incoming>
+      <bpmn:outgoing>Flow_rule_end</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+
+    <bpmn:endEvent id="EndEvent_done">
+      <bpmn:incoming>Flow_rule_end</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_start_rule" sourceRef="StartEvent_1" targetRef="categorize" />
+    <bpmn:sequenceFlow id="Flow_rule_end" sourceRef="categorize" targetRef="EndEvent_done" />
+  </bpmn:process>
+</bpmn:definitions>

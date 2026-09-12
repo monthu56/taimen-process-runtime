@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:spiffworkflow="http://spiffworkflow.org/bpmn/schema/1.0/core"
+                  id="Definitions_timer_reminder"
+                  targetNamespace="http://platform.example.com/workflows">
+  <bpmn:process id="timer_reminder" name="Timer Reminder" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_start_wait</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:intermediateCatchEvent id="wait_reminder" name="Wait">
+      <bpmn:incoming>Flow_start_wait</bpmn:incoming>
+      <bpmn:outgoing>Flow_wait_end</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerDef_1">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression"
+                           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">reminder_duration</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+
+    <bpmn:endEvent id="EndEvent_done" name="Done">
+      <bpmn:incoming>Flow_wait_end</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_start_wait" sourceRef="StartEvent_1" targetRef="wait_reminder" />
+    <bpmn:sequenceFlow id="Flow_wait_end" sourceRef="wait_reminder" targetRef="EndEvent_done" />
+  </bpmn:process>
+</bpmn:definitions>
