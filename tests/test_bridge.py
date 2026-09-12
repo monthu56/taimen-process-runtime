@@ -300,7 +300,7 @@ async def test_cp_task_cancelled_keeps_process_waiting(
             "payload": {
                 "fromStatus": "todo",
                 "status": "cancelled",
-                "systemStatusCategory": "cancelled",
+                "systemStatusCategory": "terminal_cancelled",
             },
         }
     )
