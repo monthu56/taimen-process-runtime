@@ -45,7 +45,8 @@ MANIFEST: dict[str, Any] = {
         "externalSystem": "process-runtime",
         "externalType": "activity",
         "customFieldPrefix": "process",
-        "completion": "task.completed | task.updated(systemStatusCategory=done)",
+        "completion": "task.completed | task.updated(systemStatusCategory=terminal_success)",
+        "release": "task.updated(systemStatusCategory=terminal_cancelled)",
     },
 }
 

@@ -17,9 +17,10 @@ Outbound (process log → Control Plane):
                        cancelled status.
 
 Inbound (Control Plane journal → process):
-  ``task.completed`` / ``task.updated`` with a done category → the bound activity is
-  completed with the Task's custom fields as form payload (dedup key = the event id);
-  a cancelled category releases the binding and leaves the token waiting for an operator.
+  ``task.completed`` / ``task.updated`` with ``systemStatusCategory=terminal_success`` →
+  the bound activity is completed with the Task's custom fields as form payload (dedup
+  key = the event id); ``terminal_cancelled`` releases the binding and leaves the token
+  waiting for an operator.
 """
 
 from __future__ import annotations
@@ -51,8 +52,10 @@ EXTERNAL_TYPE = "activity"
 OUTBOUND_CURSOR = "outbound"
 INBOUND_CURSOR = "inbound"
 FIELD_PREFIX = "process"
-DONE_CATEGORIES = frozenset({"done"})
-CANCELLED_CATEGORIES = frozenset({"cancelled"})
+# Control Plane system status categories (CP-ADR-0031/0048): the core branches only on
+# these; the status keys themselves are declared per task type and never compared here.
+DONE_CATEGORIES = frozenset({"terminal_success"})
+CANCELLED_CATEGORIES = frozenset({"terminal_cancelled"})
 
 
 class ControlPlane(Protocol):
@@ -322,7 +325,7 @@ class ControlPlaneBridge:
         event_type = str(event.get("type", ""))
         payload = event.get("payload") or {}
         if event_type == "task.completed":
-            category = str(payload.get("systemStatusCategory") or "done")
+            category = str(payload.get("systemStatusCategory") or "terminal_success")
         elif event_type == "task.updated" and payload.get("systemStatusCategory"):
             category = str(payload["systemStatusCategory"])
         else:

@@ -56,7 +56,7 @@ class FakeControlPlane:
             "publicId": f"TASK-{len(self.tasks) + 1:06d}",
             "title": kwargs["title"],
             "status": "todo",
-            "systemStatusCategory": "todo",
+            "systemStatusCategory": "active",
             "version": 1,
             "customFields": dict(kwargs.get("custom_fields") or {}),
             "workspaceId": kwargs.get("workspace_id"),
@@ -77,8 +77,12 @@ class FakeControlPlane:
     async def get_task_transitions(self, task_ref: str) -> dict[str, Any]:
         return {
             "targets": [
-                {"status": "cancelled", "systemStatusCategory": "cancelled", "route": "update"},
-                {"status": "done", "systemStatusCategory": "done", "route": "complete"},
+                {
+                    "status": "cancelled",
+                    "systemStatusCategory": "terminal_cancelled",
+                    "route": "update",
+                },
+                {"status": "done", "systemStatusCategory": "terminal_success", "route": "complete"},
             ]
         }
 
@@ -86,7 +90,7 @@ class FakeControlPlane:
         self.calls.append("complete_task")
         task = self.tasks[task_ref]
         assert task["version"] == version
-        task.update(status="done", systemStatusCategory="done", version=version + 1)
+        task.update(status="done", systemStatusCategory="terminal_success", version=version + 1)
         return dict(task)
 
     async def update_task(
@@ -97,7 +101,7 @@ class FakeControlPlane:
         assert task["version"] == expected_version
         if "status" in kwargs:
             task["status"] = kwargs["status"]
-            task["systemStatusCategory"] = kwargs["status"]
+            task["systemStatusCategory"] = "terminal_cancelled"
         task["version"] = expected_version + 1
         return dict(task)
 
@@ -117,7 +121,9 @@ class FakeControlPlane:
     def operator_completes(self, task_id: str, fields: dict[str, Any]) -> None:
         task = self.tasks[task_id]
         task["customFields"].update(fields)
-        task.update(status="done", systemStatusCategory="done", version=task["version"] + 1)
+        task.update(
+            status="done", systemStatusCategory="terminal_success", version=task["version"] + 1
+        )
         self.journal.append(
             {
                 "id": str(uuid.uuid4()),
@@ -129,7 +135,7 @@ class FakeControlPlane:
                 "payload": {
                     "publicId": task["publicId"],
                     "status": "done",
-                    "systemStatusCategory": "done",
+                    "systemStatusCategory": "terminal_success",
                     "version": task["version"],
                 },
             }
@@ -254,7 +260,7 @@ async def test_process_side_completion_closes_cp_task(
     )
     result = await bridge.outbound_once()
     assert not result.stalled
-    assert cp.tasks[task_id]["systemStatusCategory"] == "done"
+    assert cp.tasks[task_id]["systemStatusCategory"] == "terminal_success"
     assert cp.calls.count("complete_task") == 1
 
 
@@ -318,7 +324,7 @@ async def test_other_tenants_and_unknown_tasks_are_ignored(bridge_env, session_f
             "type": "task.completed",
             "entityType": "task",
             "entityId": str(uuid.uuid4()),
-            "payload": {"status": "done", "systemStatusCategory": "done"},
+            "payload": {"status": "done", "systemStatusCategory": "terminal_success"},
         }
     )
     assert (await bridge.inbound_once()).processed == 1  # consumed, nothing bound

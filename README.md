@@ -26,16 +26,19 @@ PC-ADR-023) 2026-09-12; история до переноса — в репози
   Control Plane и IAM; ничего не пушится, потребитель (reconciliation Control Plane по
   ADR-0023 §4) читает сам.
 
-## Чего здесь пока нет (следующие задачи, ряд control-plane)
+## Мост в Control Plane (docs/decisions/ADR-001)
 
-- `ProcessTaskBinding`: материализация User/Semantic Task в `Task` Control Plane и
-  доставка завершений обратно (ADR-0023 §3, §5);
-- `ProcessReconciliationController` и capability manifest адаптера (§2, §4);
-- ролевой контроль human task через binding'и Control Plane — сейчас задача с
-  `assigned_role` доступна любому писателю tenant'а, с `assigned_user_id` — только ему
-  и `process:admin`;
-- сигналы из событий других сервисов (в platform-core это делал FastStream-мост):
-  сигнал подаётся через `POST /instances/{id}/signal`.
+Сервис действует в ядре своим service account («Taimen Process Runtime», principal вида
+`service`): каждая активная user task процесса становится `Task` ядра с external reference
+`process-runtime/activity` и `customFields` `process*`; завершение этой задачи в ядре
+(`task.completed`, `task.updated` с категорией `terminal_success`) продвигает процесс, `customFields`
+уходят в BPMN как данные формы. Два pull-цикла с durable cursor'ами, poison-событие
+останавливает курсор, а не пропускается. Включается автоматически, когда bootstrap
+суперпроекта положил `secrets/process-runtime-iam.env` (`PR_CP_BRIDGE=auto`).
+
+Ещё не сделано: ролевой контроль human task через binding'и ядра (роль идёт в
+`processLane`), классификация Semantic/Service Task как отдельных сущностей ядра,
+publish-цикл определений (пока git и code review).
 
 ## Запуск
 
