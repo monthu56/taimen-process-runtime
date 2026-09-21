@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "BPMN/DMN process runtime of the Taimen platform: SpiffWorkflow behind a resource-service API (superproject ADR-0023/0032)"
 readme = "README.md"
 requires-python = ">=3.12"
-license = { text = "Proprietary" }
+license = { text = "Apache-2.0" }
 dependencies = [
     "alembic>=1.13",
     "control-plane-client",
