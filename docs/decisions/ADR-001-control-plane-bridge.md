@@ -1,5 +1,7 @@
 # ADR-001: Мост в Control Plane — activity как Task, завершение Task как команда движку
 
+*EN: ADR-001: Control Plane bridge — an activity as a Task, Task completion as a command to the engine*
+
 - Статус: Accepted
 - Дата: 2026-09-12
 - Исполняет: ADR-0023 суперпроекта (§2 manifest, §3 материализация, §4 корреляция, §5 без
