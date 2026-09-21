@@ -1,6 +1,6 @@
 # process-runtime
 
-*English. Русская версия: [README.ru.md](README.ru.md)*
+*English. Russian version: [README.ru.md](README.ru.md)*
 
 BPMN 2.0 / DMN process runtime of the Taimen platform: SpiffWorkflow behind a
 resource-service boundary. It implements superproject ADR-0023 (BPMN/DMN as the
