@@ -2,6 +2,13 @@
 
 *English. Russian version: [README.ru.md](README.ru.md)*
 
+> **Archived — superseded.** Process execution moved into the Control Plane core
+> (process engine with CEL conditions and business calendars, TAI-ADR-0054); goals are
+> expressed as processes (TAI-ADR-0055). This service is no longer part of the open build
+> since platform release v0.2.0 and receives no updates. BPMN definitions of this service
+> are not migrated automatically; see the v0.2.0 release notes of the
+> [umbrella repository](https://github.com/monthu56/taimen).
+
 BPMN 2.0 / DMN process runtime of the Taimen platform: SpiffWorkflow behind a
 resource-service boundary. It implements superproject ADR-0023 (BPMN/DMN as the
 definition interface, the engine behind `ProcessRuntimeAdapter`) and ADR-0032 (a workflow

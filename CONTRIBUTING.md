@@ -5,12 +5,12 @@ runtime in which people, AI agents, workflows and services execute the work
 of an organization; the platform is developed in the open under the
 Apache License 2.0. This repository holds the Process Runtime: the BPMN 2.0 /
 DMN engine (SpiffWorkflow) behind a resource-service API, one component of the
-[Taimen umbrella repository](https://github.com/taimen-ai/taimen).
+[Taimen umbrella repository](https://github.com/monthu56/taimen).
 
 ## Before you start
 
-- Read the [Product Vision](https://github.com/taimen-ai/taimen/blob/main/docs/product-vision.md)
-  and the [ADR registry](https://github.com/taimen-ai/taimen/blob/main/docs/adr/README.md)
+- Read the [Product Vision](https://github.com/monthu56/taimen/blob/main/docs/product-vision.md)
+  and the [ADR registry](https://github.com/monthu56/taimen/blob/main/docs/adr/README.md)
   of the umbrella repository. Architecture decisions are recorded as ADRs (in
   Russian, with an English title line); English summaries are provided on
   request in the ADR's discussion. This service implements the umbrella's
@@ -20,7 +20,7 @@ DMN engine (SpiffWorkflow) behind a resource-service API, one component of the
   (`ADR-001-…`, same format: Russian text with an English title line). A change
   to the engine boundary, the event journal or the Control Plane bridge needs a
   new ADR there.
-- Check the [roadmap](https://github.com/taimen-ai/taimen/blob/main/docs/roadmap.md)
+- Check the [roadmap](https://github.com/monthu56/taimen/blob/main/docs/roadmap.md)
   and open issues before starting a large change. For anything that changes an
   API, a data model or a service boundary, open an issue first and propose an
   ADR.
@@ -32,8 +32,8 @@ contribution, so that the project can be relicensed or defended without
 tracking down every author. The CLA is checked by cla-assistant on each pull
 request; you sign once.
 
-- Individuals: [`cla/CLA-individual.md`](https://github.com/taimen-ai/taimen/blob/main/cla/CLA-individual.md)
-- Companies contributing on behalf of employees: [`cla/CLA-entity.md`](https://github.com/taimen-ai/taimen/blob/main/cla/CLA-entity.md)
+- Individuals: [`cla/CLA-individual.md`](https://github.com/monthu56/taimen/blob/main/cla/CLA-individual.md)
+- Companies contributing on behalf of employees: [`cla/CLA-entity.md`](https://github.com/monthu56/taimen/blob/main/cla/CLA-entity.md)
 
 The CLA grants the project a copyright and patent licence to your
 contribution; you keep your copyright.
@@ -48,7 +48,7 @@ the bridge). Work from the umbrella checkout, or keep both checked out next to
 this repository under those names:
 
 ```bash
-git clone --recurse-submodules https://github.com/taimen-ai/taimen.git taimen
+git clone --recurse-submodules https://github.com/monthu56/taimen.git taimen
 cd taimen/process-runtime
 uv sync                                   # runtime deps + the `dev` group (pytest, ruff, httpx, pyjwt)
 uv run ruff check . && uv run ruff format --check .
